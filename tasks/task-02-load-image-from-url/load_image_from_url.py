@@ -15,9 +15,16 @@ def load_image_from_url(url, **kwargs):
     """
     
     ### START CODE HERE ###
-    ### TODO
+    arr = cv.imdecode(url, dtype=np.uint8)
+    image = cv.imdecode(arr, -1)
+
+    cv.imshow('Elephant walking', image)
+    if cv.waitKey(): quit()
     ### END CODE HERE ###
     
     return image
 
-load_image_from_url()
+parser = argparse.ArgumentParser(description="Load an image from a URL.")
+parser.add_argument("--url", type=str, required=True, help="URL of the image to load.")
+args = parser.parse_args()
+load_image_from_url(args.url)
