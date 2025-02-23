@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import cv2 as cv
+import urllib.request
 
 def load_image_from_url(url, **kwargs):
     """
@@ -15,16 +16,17 @@ def load_image_from_url(url, **kwargs):
     """
     
     ### START CODE HERE ###
-    arr = cv.imdecode(url, dtype=np.uint8)
-    image = cv.imdecode(arr, -1)
+    with urllib.request.urlopen(url) as response:
+        image_array = np.asarray(bytearray(response.read()), dtype=np.uint8)
 
-    cv.imshow('Elephant walking', image)
-    if cv.waitKey(): quit()
+        flags = kwargs.get("flags", cv.IMREAD_COLOR)
+        image = cv.imdecode(image_array, flags)
     ### END CODE HERE ###
     
     return image
 
-parser = argparse.ArgumentParser(description="Load an image from a URL.")
-parser.add_argument("--url", type=str, required=True, help="URL of the image to load.")
-args = parser.parse_args()
-load_image_from_url(args.url)
+image = load_image_from_url(url, flags=cv.IMREAD_COLOR)
+
+cv.imshow("Image from URL", image)
+cv.waitKey(0)
+cv.destroyAllWindows()
