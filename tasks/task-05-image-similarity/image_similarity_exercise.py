@@ -31,19 +31,16 @@ Assume that i1 and i2 are normalized grayscale images (values between 0 and 1).
 
 import numpy as np
 
-def compare_images(i1: np.ndarray, i2: np.ndarray) -> dict:
-    if i1.shape != i2.shape:
-        raise ValueError("Imagens de tamanho incompatível")
-    
-    mse = np.mean((i1 - i2) ** 2)
+def mean_squared_error (i1: np.ndarray, i2: np.ndarray):
+    return np.mean((i1 - i2) ** 2)
 
-    max = 255.0
-    
+def peak_signal_to_noise_ratio (i1: np.ndarray, i2: np.ndarray, mse, max):
     if mse == 0:
-        psnr = float('inf')
+        return float('inf')
     else:
-        psnr = 20 * np.log10(max) - 10 * np.log10(mse)
-
+        return 20 * np.log10(max) - 10 * np.log10(mse)
+    
+def structural_similarity_index(i1: np.ndarray, i2: np.ndarray, max):
     c1 = (0.01 * max) ** 2
     c2 = (0.03 * max) ** 2
     c3 = c2/2
@@ -59,9 +56,24 @@ def compare_images(i1: np.ndarray, i2: np.ndarray) -> dict:
 
     structure = (covariance + c3)/(np.sqrt(variance1 * variance2) + c3)
 
-    ssim = luminance * contrast * structure
+    return luminance * contrast * structure
 
-    npcc = np.corrcoef(i1.flatten(), i2.flatten())[0,1]
+def normalized_pearson_correlation_coeficient(i1: np.ndarray, i2: np.ndarray):
+    return np.corrcoef(i1.flatten(), i2.flatten())[0,1]
+
+def compare_images(i1: np.ndarray, i2: np.ndarray) -> dict:
+    if i1.shape != i2.shape:
+        raise ValueError("Imagens de tamanho incompatível")
+    
+    max = 255.0
+
+    mse = mean_squared_error(i1, i2)
+    
+    psnr = peak_signal_to_noise_ratio(i1, i2, mse, max)
+
+    ssim = structural_similarity_index(i1, i2, max)
+
+    npcc = normalized_pearson_correlation_coeficient(i1, i2)
 
     return {"mse": mse,
             "psnr": psnr, 
