@@ -33,7 +33,7 @@ import numpy as np
 
 def compare_images(i1: np.ndarray, i2: np.ndarray) -> dict:
     if i1.shape != i2.shape:
-        print("Imagens de tamanho incompatível")
+        raise ValueError("Imagens de tamanho incompatível")
     
     mse = np.mean((i1 - i2) ** 2)
 
